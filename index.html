@@ -242,7 +242,7 @@
         </div>
         <div class="content has-text-justified" style="font-size:20px;">
           <p>
-            Given a pre-trained restoration model that produces low-quality restoration outputs (severe artifacts on hair and over-smoothed skin) on samples with unknown and out-of-distribution degradations, we generate pseudo targets using a pre-trained unconditional diffusion model with a combination of low frequency content constrained denoising and unconditional denoising. The generated clean images can be used as pseudo GT to fine-tune the pre-trained restoration model without the need for real GT images. 
+            Given a restoration model pre-trained on synthetic dataset in a supervised fashion, it can produce high-quality restoration on low-quality images that are aligned with the degradation distribution used in training (a). However, it often fails on inputs of out-of-distribution degradations (b). We propose an unsupervised pipeline to adapt a pre-trained model to unpaired degraded images with a much smaller data-size. This addresses the issue of target domain degradations without paired ground-truth images or the knowledge of target data's degradation type (c). 
           </p>
         </div>
       </div>
