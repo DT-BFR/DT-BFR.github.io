@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Towards Unsupervised Blind Face Restoration using Diffusion Prior">
+  <meta name="keywords" content="Blind Face Restoration, Diffusion Model, Generative Prior">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>Towards Unsupervised Blind Face Restoration using Diffusion Prior</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+
+
+  <script>
+    function initComparisons() {
+      var x, i;
+      /* Find all elements with an "overlay" class: */
+      x = document.getElementsByClassName("img-comp-overlay");
+      for (i = 0; i < x.length; i++) {
+        /* Once for each "overlay" element:
+        pass the "overlay" element as a parameter when executing the compareImages function: */
+        compareImages(x[i]);
+      }
+      function compareImages(img) {
+        var slider, img, clicked = 0, w, h;
+        /* Get the width and height of the img element */
+        w = img.offsetWidth;
+        h = img.offsetHeight;
+        /* Set the width of the img element to 50%: */
+        img.style.width = (w / 2) + "px";
+        /* Create slider: */
+        slider = document.createElement("DIV");
+        slider.setAttribute("class", "img-comp-slider");
+        /* Insert slider */
+        img.parentElement.insertBefore(slider, img);
+        /* Position the slider in the middle: */
+        slider.style.top = (h / 2) - (slider.offsetHeight / 2) + "px";
+        slider.style.left = (w / 2) - (slider.offsetWidth / 2 + 1) + "px";
+        /* Execute a function when the mouse button is pressed: */
+        slider.addEventListener("mousedown", slideReady);
+        /* And another function when the mouse button is released: */
+        window.addEventListener("mouseup", slideFinish);
+        /* Or touched (for touch screens: */
+        slider.addEventListener("touchstart", slideReady);
+        /* And released (for touch screens: */
+        window.addEventListener("touchend", slideFinish);
+        function slideReady(e) {
+          /* Prevent any other actions that may occur when moving over the image: */
+          e.preventDefault();
+          /* The slider is now clicked and ready to move: */
+          clicked = 1;
+          /* Execute a function when the slider is moved: */
+          window.addEventListener("mousemove", slideMove);
+          window.addEventListener("touchmove", slideMove);
+        }
+        function slideFinish() {
+          /* The slider is no longer clicked: */
+          clicked = 0;
+        }
+        function slideMove(e) {
+          var pos;
+          /* If the slider is no longer clicked, exit this function: */
+          if (clicked == 0) return false;
+          /* Get the cursor's x position: */
+          pos = getCursorPos(e)
+          /* Prevent the slider from being positioned outside the image: */
+          if (pos < 0) pos = 0;
+          if (pos > w) pos = w;
+          /* Execute a function that will resize the overlay image according to the cursor: */
+          slide(pos);
+        }
+        function getCursorPos(e) {
+          var a, x = 0;
+          e = (e.changedTouches) ? e.changedTouches[0] : e;
+          /* Get the x positions of the image: */
+          a = img.getBoundingClientRect();
+          /* Calculate the cursor's x coordinate, relative to the image: */
+          x = e.pageX - a.left;
+          /* Consider any page scrolling: */
+          x = x - window.pageXOffset;
+          return x;
+        }
+        function slide(x) {
+          /* Resize the image: */
+          img.style.width = x + "px";
+          img.style.height = h;
+          /* Position the slider: */
+          slider.style.left = img.offsetWidth - (slider.offsetWidth / 2 + 1) + "px";
+        }
+      }
+    }
+  </script>
+
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">Towards Unsupervised Blind Face Restoration using Diffusion Prior</h1>
+          <!-- <p class="is-size-5 text-center">
+            arXiv Preprint
+		      </p> -->
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://tianshukuai.github.io/">Tianshu Kuai</a><sup>2</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://sinahonari.github.io/">Sina Honari</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://www.gilitschenski.org/igor/">Igor Gilitschenski</a><sup>2,3</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=7EFMKWUAAAAJ&hl=en">Alex Levinshtein</a><sup>1</sup>
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Samsung AI Centre Toronto</span>&nbsp;&nbsp;
+            <span class="author-block"><sup>2</sup>University of Toronto</span>&nbsp;&nbsp;
+            <span class="author-block"><sup>3</sup>Vector Institute for AI</span>
+          </div>
+
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="https://DT-BFR.github.io/"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv (Coming Soon)</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://DT-BFR.github.io/"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper (Coming Soon)</span>
+                </a>
+              </span>
+              <!-- <span class="link-block">
+                <a href="index.html"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-youtube"></i>
+                  </span>
+                  <span>Video</span>
+                </a>
+              </span> -->
+              <span class="link-block">
+                <a href="https://DT-BFR.github.io/"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code (Coming Soon)</span>
+                  </a>
+              </span>
+              <!-- <span class="link-block">
+                <a href="index.html" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="far fa-images"></i>
+                  </span>
+                  <span>Data</span>
+                  </a>
+              </span> -->
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column">
+        <div class="content has-text-justified">
+          <img src="data/images/teaser.jpg" width="100%"/>
+        </div>
+        <div class="content has-text-justified" style="font-size:20px;">
+          <p>
+            Given a restoration model pre-trained on synthetic dataset in a supervised fashion, it can produce high-quality restoration on low-quality images that are aligned with the degradation distribution used in training (a). However, it often fails on inputs of out-of-distribution degradations (b). We propose an unsupervised pipeline to generate pseudo targets for unpaired degraded images and use them to fine-tune the pre-trained model. This addresses the issue of domain gap without the knowledge of target data's degradation type or paired ground-truth images (c).
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-9">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified" style="font-size:20px;">
+          <p>
+            Blind face restoration methods have shown remarkable performance, particularly when trained on large-scale synthetic datasets with supervised learning. These datasets are often generated by simulating low-quality face images with a handcrafted image degradation pipeline. The models trained on such synthetic degradations, however, cannot deal with inputs of unseen degradations. In this paper, we address this issue by using only a set of input images, with unknown degradations and without ground truth targets, to fine-tune a restoration model that learns to map them to clean and contextually consistent outputs. We utilize a pre-trained diffusion model as a generative prior through which we generate high quality images from the natural image distribution while maintaining the input image content through consistency constraints. These generated images are then used as pseudo targets to fine-tune a pre-trained restoration model. Unlike many recent approaches that employ diffusion models at test time, we only do so during training and thus maintain an efficient inference-time performance. Extensive experiments show that the proposed approach can consistently improve the perceptual quality of pre-trained blind face restoration models while maintaining great consistency with the input contents. Our best model also achieves the state-of-the-art results on both synthetic and real-world datasets.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column">
+        <h2 class="title is-3">Method</h2>
+        <div class="content has-text-justified">
+          <img src="data/images/method.png" width="100%"/>
+        </div>
+        <div class="content has-text-justified" style="font-size:20px;">
+          <p>
+            Given a pre-trained restoration model that produces low-quality restoration outputs (severe artifacts on hair and over-smoothed skin) on samples with unknown and out-of-distribution degradations, we generate pseudo targets using a pre-trained unconditional diffusion model with a combination of low frequency content constrained denoising and unconditional denoising. The generated clean images can be used as pseudo GT to fine-tune the pre-trained restoration model without the need for real GT images. 
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <h3 class="title is-3">Improvements upon Pre-trained Models</h3>
+    <div class="columns is-centered has-text-centered">
+      <div class="column" style="font-size:25px;">
+        <p>SwinIR</p>
+      </div>
+      <div class="column" style="font-size:25px;">
+        <p>CodeFormer</p>
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="column">
+        <div class="img-comp-container" style="margin-bottom: 10px;">
+          <div class="img-comp-img">
+            <img src="data/images/finetuned/swinir/00002543.png" width="256" height="256">
+          </div>
+          <div class="img-comp-img img-comp-overlay">
+            <img src="data/images/pretrained/swinir/00002543.png" width="256" height="256">
+          </div>
+        </div>
+        <div class="img-comp-container" style="margin-bottom: 10px;">
+          <div class="img-comp-img">
+            <img src="data/images/finetuned/swinir/00002556.png" width="256" height="256">
+          </div>
+          <div class="img-comp-img img-comp-overlay">
+            <img src="data/images/pretrained/swinir/00002556.png" width="256" height="256">
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="img-comp-container" style="margin-bottom: 10px;">
+          <div class="img-comp-img">
+            <img src="data/images/finetuned/swinir/00002607.png" width="256" height="256">
+          </div>
+          <div class="img-comp-img img-comp-overlay">
+            <img src="data/images/pretrained/swinir/00002607.png" width="256" height="256">
+          </div>
+        </div>
+        <div class="img-comp-container" style="margin-bottom: 10px;">
+          <div class="img-comp-img">
+            <img src="data/images/finetuned/swinir/00002736.png" width="256" height="256">
+          </div>
+          <div class="img-comp-img img-comp-overlay">
+            <img src="data/images/pretrained/swinir/00002736.png" width="256" height="256">
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="img-comp-container" style="margin-bottom: 10px;">
+          <div class="img-comp-img">
+            <img src="data/images/finetuned/codeformer/00002543.png" width="256" height="256">
+          </div>
+          <div class="img-comp-img img-comp-overlay">
+            <img src="data/images/pretrained/codeformer/00002543.png" width="256" height="256">
+          </div>
+        </div>
+        <div class="img-comp-container" style="margin-bottom: 10px;">
+          <div class="img-comp-img">
+            <img src="data/images/finetuned/codeformer/00002556.png" width="256" height="256">
+          </div>
+          <div class="img-comp-img img-comp-overlay">
+            <img src="data/images/pretrained/codeformer/00002556.png" width="256" height="256">
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="img-comp-container" style="margin-bottom: 10px;">
+          <div class="img-comp-img">
+            <img src="data/images/finetuned/codeformer/00002607.png" width="256" height="256">
+          </div>
+          <div class="img-comp-img img-comp-overlay">
+            <img src="data/images/pretrained/codeformer/00002607.png" width="256" height="256">
+          </div>
+        </div>
+        <div class="img-comp-container" style="margin-bottom: 10px;">
+          <div class="img-comp-img">
+            <img src="data/images/finetuned/codeformer/00002736.png" width="256" height="256">
+          </div>
+          <div class="img-comp-img img-comp-overlay">
+            <img src="data/images/pretrained/codeformer/00002736.png" width="256" height="256">
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+  <div class="columns is-centered has-text-centered">
+    <div class="column">
+      <p>Interactive comparison between pre-trained (<b>left</b>) and our fine-tuned (<b>right</b>) models for SwinIR and CodeFormer.</p>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column">
+        <h2 class="title is-3">Comparison to Other Methods on Real-world Degraded Inputs</h2>
+        <div class="content has-text-justified">
+          <img src="data/images/real_world_results.jpeg" width="100%"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@inproceedings{kuai2024towards,
+    author={Kuai, Tianshu and Honari, Sina and Gilitschenski, Igor and Levinshtein, Alex},
+    title={Towards Unsupervised Blind Face Restoration using Diffusion Prior},
+    booktitle={arXiv},
+    year={2024},
+}</code></pre>
+  </div>
+</section>
+
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is licensed under a <a rel="license"
+                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>. The website template is borrowed from <a href="https://github.com/nerfies/nerfies.github.io">NeRFies</a>, <a href="https://spinnerf3d.github.io/">SPIn-NeRF</a>, and <a href="https://gen2res.github.io/">gen2res</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+  initComparisons();
+</script>
+</body>
+</html>
